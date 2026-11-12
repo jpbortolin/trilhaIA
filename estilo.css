@@ -1,0 +1,134 @@
+:root { color-scheme: light; font-family: Arial, sans-serif; color: #172d40; background: #f1f5f9; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { max-width: 1000px; margin: 32px auto; padding: 24px; background: white; border-radius: 14px; }
+h1, h2 { color: #124c63; }
+p, li { line-height: 1.6; }
+button, select, input { font: inherit; padding: 10px; border: 1px solid #94a3b8; border-radius: 6px; }
+button { cursor: pointer; color: white; background: #125d78; }
+button:hover { background: #08445a; }
+button:disabled { opacity: .6; cursor: wait; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid #de9700; outline-offset: 3px; }
+.painel { padding: 16px; margin: 16px 0; background: #eaf2f7; border-radius: 8px; }
+.ok { color: #146c39; }
+.falhou { color: #b42318; font-weight: bold; }
+code { overflow-wrap: anywhere; }
+svg { max-width: 100%; height: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 10px; border-bottom: 1px solid #cbd5e1; text-align: left; }
+progress { width: 100%; }
+@media (max-width: 600px) { main { margin: 12px; padding: 16px; } }
+
+/* Interface do jogo; as regras e os agentes continuam nos arquivos compartilhados. */
+.pagina-jogo { background: #f2f0e9; color: #253c39; }
+.pagina-jogo main { max-width: 1180px; margin: 0 auto; padding: 40px 32px 20px; background: transparent; }
+.cabecalho { display: flex; justify-content: space-between; align-items: start; gap: 24px; margin-bottom: 30px; }
+.sobretitulo { font-size: 10px; font-weight: bold; letter-spacing: 1.6px; margin: 0 0 12px; color: #526a61; }
+.pagina-jogo h1 { font-family: Georgia, serif; font-size: clamp(28px, 4vw, 44px); font-weight: normal; letter-spacing: -1.5px; color: #203e34; margin: 0 0 12px; }
+.introducao { margin: 0; color: #586760; font-size: 14px; max-width: 580px; }
+.atalho { color: #38584b; font-size: 12px; white-space: nowrap; padding-top: 8px; text-underline-offset: 4px; }
+.configuracao { display: grid; grid-template-columns: 1.5fr 1fr 1fr auto; align-items: end; gap: 14px; padding: 20px; border: 1px solid #d9ddd2; background: #fafbf7; border-radius: 12px; margin-bottom: 24px; }
+.configuracao label { display: grid; gap: 8px; font-size: 12px; font-weight: bold; color: #455e53; }
+.configuracao select { width: 100%; min-width: 0; height: 42px; background: white; border-color: #ccd5ca; color: #253c39; font-size: 14px; }
+.pagina-jogo button { background: #2b5948; border-color: #2b5948; min-height: 42px; }
+.pagina-jogo button:hover { background: #214334; }
+#novo-jogo { display: flex; gap: 28px; justify-content: space-between; align-items: center; font-size: 14px; padding-inline: 18px; }
+.ajuda-configuracao { grid-column: 1 / -1; margin: 0; color: #59665f; font-size: 11px; }
+.area-jogo { display: grid; grid-template-columns: minmax(0, 1fr) 296px; gap: 24px; align-items: start; }
+.mesa { background: #fdfcf8; border: 1px solid #d9ddd2; border-radius: 14px; padding: 24px; }
+.titulo-mesa { display: flex; justify-content: space-between; align-items: center; }
+.titulo-mesa h2 { margin: 0; font-family: Georgia, serif; font-size: 25px; font-weight: normal; color: #263e35; }
+.titulo-mesa span { font-size: 11px; color: #5c6c60; padding: 7px 10px; background: #eef1e8; border-radius: 20px; }
+#tabuleiro { display: block; width: 100%; max-width: 640px; margin: 4px auto; overflow: visible; touch-action: manipulation; }
+.linha-tabuleiro { stroke: #839486; stroke-width: 3; stroke-linecap: round; }
+.ponto { outline: none; }
+.area-clique { fill: transparent; }
+.ponto.permitido { cursor: pointer; }
+.realce { fill: none; stroke: transparent; stroke-width: 3; }
+.peca { stroke: #7d9181; stroke-width: 2; fill: #fdfcf8; }
+.vazio .peca { r: 5; fill: #829786; stroke: #fdfcf8; stroke-width: 2; }
+.humano .peca { fill: #fffdf2; stroke: #435f50; stroke-width: 3; filter: drop-shadow(0 2px 2px #243d3526); }
+.ia .peca { fill: #29483c; stroke: #19382d; stroke-width: 3; filter: drop-shadow(0 2px 2px #243d3526); }
+.destino-possivel .realce { fill: #e7f0df; stroke: #81a17a; stroke-width: 2; stroke-dasharray: 3 5; }
+.destino-possivel .peca { fill: #436d4d; }
+.selecionado .realce { stroke: #235f99; stroke-width: 4; }
+.removivel .realce { stroke: #b44b40; fill: #f9e9e4; stroke-width: 3; stroke-dasharray: 5 4; }
+.ponto.permitido:hover .realce { stroke: #2e6550; stroke-width: 4; }
+.ponto.removivel:hover .realce { stroke: #b44b40; }
+.ponto:focus-visible .realce { stroke: #235f99; stroke-width: 4; stroke-dasharray: none; }
+.legenda { display: flex; justify-content: center; flex-wrap: wrap; gap: 18px; color: #59685e; font-size: 11px; }
+.legenda span { display: inline-flex; align-items: center; gap: 6px; }
+.marca { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 2px dashed; }
+.marca.destino { border-color: #658b60; }
+.marca.captura { border-color: #b44b40; }
+.orientacao { margin-top: 22px; padding-top: 18px; border-top: 1px solid #dfe3d9; }
+#mensagem { min-height: 44px; margin: 0 0 10px; font-size: 14px; line-height: 1.6; color: #2c4a3b; }
+.pagina-jogo .botao-discreto { background: transparent; color: #385947; border: 1px solid #bdcbbb; font-size: 12px; padding: 8px 12px; min-height: 36px; }
+.pagina-jogo .botao-discreto:hover { background: #e8eee1; }
+.pagina-jogo .botao-discreto:disabled { cursor: default; }
+.lateral { display: grid; gap: 18px; }
+.cartao { background: #fafbf7; border: 1px solid #d9ddd2; border-radius: 12px; padding: 22px; min-width: 0; }
+.cartao h2 { color: #2a4739; font-size: 20px; font-weight: normal; font-family: Georgia, serif; margin: 0 0 8px; }
+.fase { font-size: 12px; color: #5c6e60; margin: 0 0 18px; }
+.jogador { display: flex; gap: 10px; align-items: center; padding: 10px 8px; border-radius: 8px; }
+.jogador.ativo { background: #e8eedf; }
+.jogador strong { display: block; font-size: 14px; }
+.jogador small { display: block; color: #5c6d5e; font-size: 10px; margin-top: 4px; }
+.amostra { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; border: 2px solid #476451; }
+.amostra.clara { background: #fffdf2; }
+.amostra.escura { background: #29483c; }
+.contagem { margin-left: auto; text-align: right; }
+.reserva { display: flex; justify-content: space-between; margin: 8px 8px 16px 42px; font-size: 11px; color: #5b6c5d; }
+.reserva:last-child { margin-bottom: 0; }
+.estatisticas { margin: 0; font-size: 12px; }
+.estatisticas > div { display: flex; justify-content: space-between; gap: 10px; padding: 11px 0; border-top: 1px solid #e1e6da; }
+.estatisticas dt { color: #5b6b5f; }
+.estatisticas dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: bold; }
+.nota { font-size: 11px; line-height: 1.6; margin: 12px 0 0; color: #59685c; }
+.regras summary { cursor: pointer; font-size: 14px; color: #34543f; }
+.regras ol { padding-left: 20px; font-size: 12px; }
+.regras p { font-size: 12px; color: #53634f; }
+.rodape { text-align: center; font-size: 10px; color: #60705f; margin: 24px 0 0; line-height: 1.7; }
+.botoes { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.pagina-torneio .cartao { margin-bottom: 20px; }
+.aviso { padding: 16px 20px; background: #f7e8c9; border: 1px solid #d1b375; border-radius: 10px; font-size: 13px; }
+.campos-torneio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.campos-torneio label { display: grid; gap: 8px; font-size: 12px; }
+.campos-torneio input, .campos-torneio select { width: 100%; min-width: 0; background: white; }
+.pagina-torneio fieldset { border: 1px solid #cbd6c7; border-radius: 8px; margin: 18px 0; padding: 16px; }
+.pagina-torneio legend { font-size: 13px; padding: 0 7px; }
+.pagina-torneio fieldset label { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; margin: 6px 18px 6px 0; }
+.pagina-torneio input[type="checkbox"] { accent-color: #2b5948; width: 18px; height: 18px; }
+.pagina-torneio progress { accent-color: #2b5948; height: 18px; }
+.pagina-torneio h3 { font-family: Georgia, serif; font-size: 19px; font-weight: normal; margin: 30px 0 12px; }
+.registro { max-height: 240px; overflow: auto; white-space: pre-wrap; font-size: 12px; line-height: 1.6; }
+.carregar { display: grid; gap: 8px; font-size: 12px; max-width: 100%; }
+.carregar input { max-width: 100%; font-size: 12px; }
+.tabela-rolavel { overflow: auto; margin: 18px 0; border: 1px solid #d9ddd2; border-radius: 6px; }
+.tabela-rolavel table { font-size: 12px; white-space: nowrap; }
+.tabela-rolavel th { background: #e9efe3; }
+.tabela-rolavel td, .tabela-rolavel th { padding: 10px 12px; }
+.grafico { background: white; padding: 12px; margin-top: 24px; border: 1px solid #d9ddd2; border-radius: 10px; }
+.grafico svg { width: 100%; height: auto; }
+#markdown { width: 100%; height: 180px; margin-top: 16px; }
+.relatorio .titulo-mesa { gap: 16px; flex-wrap: wrap; }
+.relatorio .titulo-mesa label { font-size: 12px; }
+@media (max-width: 650px) { .campos-torneio { grid-template-columns: 1fr; } .pagina-torneio .cartao { padding: 16px; } }
+@media (max-width: 850px) {
+  .pagina-jogo main { padding: 24px 18px; }
+  .configuracao { grid-template-columns: 1fr 1fr; }
+  .area-jogo { grid-template-columns: minmax(0, 1fr); }
+  .lateral { grid-template-columns: 1fr 1fr; }
+  .regras { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) {
+  .pagina-jogo main { margin: 0; padding: 24px 12px; }
+  .cabecalho { flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .configuracao { padding: 14px; gap: 12px; }
+  .configuracao label:first-child { grid-column: 1 / -1; }
+  #novo-jogo { grid-column: 1 / -1; }
+  .mesa { padding: 16px 10px; }
+  .orientacao { margin-inline: 6px; }
+  .lateral { grid-template-columns: 1fr; }
+  .cartao { padding: 20px; }
+}
