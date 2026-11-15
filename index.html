@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trilha — Você contra a IA</title>
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body class="pagina-jogo">
+<main>
+  <header class="cabecalho">
+    <div>
+      <p class="sobretitulo">INTELIGÊNCIA ARTIFICIAL · JOGO DE TABULEIRO</p>
+      <h1>Trilha contra a IA</h1>
+      <p class="introducao">Alinhe três peças para formar um moinho e capturar uma peça adversária.</p>
+    </div>
+    <nav class="botoes">
+      <a class="atalho" href="torneio.html">Torneio ↗</a>
+      <a class="botao-apresentacao" href="apresentacao.html">Apresentação</a>
+    </nav>
+  </header>
+
+  <form id="configuracao" class="configuracao">
+    <label>Algoritmo da IA
+      <select id="algoritmo">
+        <option value="mcts">MCTS / UCT</option>
+        <option value="minimax">Minimax com alfa-beta</option>
+        <option value="monteCarlo">Monte Carlo plano</option>
+      </select>
+    </label>
+    <label>Tempo por jogada
+      <select id="tempo">
+        <option value="100">100 ms</option>
+        <option value="500">500 ms</option>
+        <option value="1000">1000 ms</option>
+      </select>
+    </label>
+    <label>Quem começa?
+      <select id="comeca">
+        <option value="1">Você</option>
+        <option value="2">IA</option>
+      </select>
+    </label>
+    <button type="submit" id="novo-jogo">Novo jogo <span aria-hidden="true">↗</span></button>
+    <p class="ajuda-configuracao">As opções escolhidas são aplicadas ao iniciar um novo jogo.</p>
+  </form>
+
+  <div class="area-jogo">
+    <section class="mesa" aria-label="Tabuleiro e instruções da jogada">
+      <div class="titulo-mesa"><h2>Trilha</h2><span id="numero-turno">Turno 1</span></div>
+      <svg id="tabuleiro" viewBox="0 0 640 640" role="group" aria-labelledby="titulo-tabuleiro descricao-tabuleiro">
+        <title id="titulo-tabuleiro">Tabuleiro de Trilha com 24 posições</title>
+        <desc id="descricao-tabuleiro">Clique em uma posição. Também é possível usar Tab para navegar e Enter ou espaço para jogar.</desc>
+      </svg>
+      <div class="legenda">
+        <span><i class="marca destino"></i>Destino possível</span>
+        <span><i class="marca captura"></i>Peça removível</span>
+      </div>
+      <div class="orientacao">
+        <p id="mensagem" role="status" aria-live="polite">Preparando a partida...</p>
+        <button type="button" id="cancelar" class="botao-discreto" disabled>Cancelar escolha</button>
+      </div>
+    </section>
+
+    <aside class="lateral" aria-label="Informações da partida">
+      <section class="cartao">
+        <p class="sobretitulo">NESTA PARTIDA</p>
+        <h2 id="vez">Sua vez</h2>
+        <p id="fase" class="fase"></p>
+        <div id="jogador-humano" class="jogador">
+          <span class="amostra clara" aria-hidden="true"></span>
+          <div><strong>Você</strong><small>Peças claras</small></div>
+          <div class="contagem"><strong id="pecas-humano">0</strong><small>no tabuleiro</small></div>
+        </div>
+        <p class="reserva">Na reserva <strong id="reserva-humano">9</strong></p>
+        <div id="jogador-ia" class="jogador">
+          <span class="amostra escura" aria-hidden="true"></span>
+          <div><strong>IA</strong><small>Peças escuras</small></div>
+          <div class="contagem"><strong id="pecas-ia">0</strong><small>no tabuleiro</small></div>
+        </div>
+        <p class="reserva">Na reserva <strong id="reserva-ia">9</strong></p>
+      </section>
+
+      <section class="cartao">
+        <p class="sobretitulo">ÚLTIMA DECISÃO DA IA</p>
+        <h2 id="nome-agente">MCTS / UCT</h2>
+        <p id="orcamento" class="fase"></p>
+        <dl class="estatisticas">
+          <div><dt>Tempo utilizado</dt><dd id="estatistica-tempo">—</dd></div>
+          <div><dt>Simulações</dt><dd id="estatistica-simulacoes">—</dd></div>
+          <div><dt>Nós</dt><dd id="estatistica-nos">—</dd></div>
+          <div><dt>Profundidade</dt><dd id="estatistica-profundidade">—</dd></div>
+        </dl>
+        <p id="aviso-agente" class="nota">As estatísticas aparecem após a primeira jogada da IA.</p>
+      </section>
+
+      <details class="cartao regras">
+        <summary>Como jogar</summary>
+        <ol>
+          <li>Coloque suas nove peças nas posições vazias.</li>
+          <li>Depois, selecione uma peça e mova para um ponto vizinho vazio.</li>
+          <li>Com três peças restantes, você pode voar para qualquer ponto vazio.</li>
+          <li>Ao alinhar três peças, escolha uma peça adversária destacada para remover.</li>
+        </ol>
+        <p>Peças em moinhos ficam protegidas, exceto quando todas as peças adversárias estão em moinhos. Um moinho duplo remove uma peça.</p>
+        <p>Sem reserva, perde quem ficar com menos de três peças; após a colocação, também perde quem não puder mover. Repetição, 100 turnos sem captura após a colocação ou 400 turnos totais encerram a partida em empate.</p>
+        <p>Use <kbd>Esc</kbd> ou “Cancelar escolha” para cancelar uma seleção ainda não concluída.</p>
+      </details>
+    </aside>
+  </div>
+  <footer class="rodape">Trilha · MCTS, Minimax e Monte Carlo · Projeto de Inteligência Artificial</footer>
+  <noscript>Ative o JavaScript no navegador para jogar.</noscript>
+</main>
+<script src="motor.js"></script>
+<script src="agentes.js"></script>
+<script src="jogo.js"></script>
+</body>
+</html>
