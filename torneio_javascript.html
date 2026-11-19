@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trilha — Coleta experimental</title>
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body class="pagina-jogo pagina-torneio">
+<main>
+  <header class="cabecalho">
+    <div><h1>Coleta JavaScript de Trilha</h1>
+    <p class="introducao">Execute os blocos do artigo e exporte os resultados.</p></div>
+    <nav class="botoes"><a class="atalho" href="index.html">Jogo</a><a class="botao-apresentacao" href="apresentacao.html">Apresentação</a></nav>
+  </header>
+  <section class="cartao">
+    <h2>Executar</h2>
+    <p>Esta página usa o motor JavaScript da coleta anterior. <a href="torneio.html">Abrir coleta Rust/WebAssembly</a>.</p>
+    <label>Bloco
+      <select id="bloco">
+        <option value="piloto">Piloto — 60 partidas</option>
+        <option value="principal">Principal — 30 de aquecimento + 600 avaliadas</option>
+        <option value="fixo">Esforço fixo — 600 partidas</option>
+        <option value="ablacoes">Ablações — 600 partidas</option>
+        <option value="posicoes">Posições iniciais — 480 partidas</option>
+      </select>
+    </label>
+    <p>Mantenha a aba visível durante a execução. Use o mesmo computador e navegador para comparar tempos.</p>
+    <div class="botoes">
+      <button id="executar" type="button" disabled>Iniciar bloco</button>
+      <button id="pausar" type="button" disabled>Pausar</button>
+    </div>
+    <p id="situacao" role="status">Abrindo a coleta...</p>
+    <progress id="progresso" value="0" max="1" aria-label="Partidas concluídas"></progress>
+    <p id="armazenamento" class="nota"></p>
+  </section>
+  <section class="cartao">
+    <h2>Dados do bloco</h2>
+    <div class="botoes">
+      <button id="json" type="button" disabled>Baixar JSON de progresso</button>
+      <button id="jsonl" type="button" disabled>Baixar partidas JSONL</button>
+      <button id="csv" type="button" disabled>Baixar partidas CSV</button>
+      <label class="carregar">Carregar progresso JSON<input id="arquivo" type="file" accept=".json" disabled></label>
+    </div>
+    <p>O JSON permite retomar a coleta. JSONL e CSV são os arquivos para análise e registro.</p>
+  </section>
+  <section class="cartao">
+    <h2>Resultados</h2>
+    <p>As tabelas usam pares completos e separam o aquecimento da análise principal.</p>
+    <div class="botoes"><button id="resumo" type="button" disabled>Baixar resumo CSV</button>
+      <button id="estatistica" type="button" disabled>Baixar permutação e Holm em CSV</button></div>
+    <div id="tabelas"></div>
+    <div id="significancia"></div>
+    <details><summary>Gráficos</summary><div id="graficos"></div></details>
+  </section>
+</main>
+<script src="javascript/motor.js"></script>
+<script src="javascript/agentes.js"></script>
+<script src="javascript/relatorio.js"></script>
+<script src="javascript/torneio.js"></script>
+<script src="javascript/protocolo.js"></script>
+<script src="javascript/coleta.js"></script>
+</body>
+</html>

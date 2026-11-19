@@ -115,7 +115,7 @@ const Torneio = (() => {
     // Dá ao navegador oportunidade de informar ocultação antes de aceitar o resultado.
     await new Promise(concluir => setTimeout(concluir, 0));
     verificar();
-    const registro = { versao: 1, execucao, ...tarefa, quemComecou: tarefa.corA === 1 ? tarefa.agenteA : tarefa.agenteB,
+    const registro = { versao: 1, motor: Rust.VERSAO, execucao, ...tarefa, quemComecou: tarefa.corA === 1 ? tarefa.agenteA : tarefa.agenteB,
       resultado: fim.vencedor === 0 ? "empate" : fim.vencedor === tarefa.corA ? "A" : "B",
       motivo: fim.motivo, chaveInicial: inicial, turnosIniciais, turnos: acoes.length, acoes };
     totais.forEach((total, indice) => {

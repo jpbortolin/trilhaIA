@@ -3,7 +3,7 @@
 const Protocolo = (() => {
   const CONFRONTOS = [["mcts", "minimax"], ["mcts", "monteCarlo"], ["minimax", "monteCarlo"]];
   const SEMENTE_BASE = 2026;
-  const VERSAO = 1;
+  const VERSAO = 2;
   const BASE = { iteracoesMcts: 1000, iteracoesMonteCarlo: 1000,
     profundidadeMinimax: 4, exploracao: Math.SQRT2, horizonte: 80 };
   const VARIANTES = [
@@ -124,13 +124,13 @@ const Protocolo = (() => {
   }
 
   function validar(sessao) {
-    if (!sessao || sessao.protocolo !== VERSAO || typeof sessao.execucao !== "string" ||
+    if (!sessao || sessao.motor !== Rust.VERSAO || sessao.protocolo !== VERSAO || typeof sessao.execucao !== "string" ||
         !sessao.execucao || typeof sessao.ambiente !== "string") throw new Error("Arquivo de coleta inválido.");
     const plano = new Map(criarPlano(sessao.bloco).map(tarefa => [Relatorio.identificador(tarefa), tarefa]));
     Relatorio.validarRegistros(sessao.registros);
     for (const r of sessao.registros) {
       const tarefa = plano.get(Relatorio.identificador(r));
-      if (!tarefa || r.execucao !== sessao.execucao || Object.keys(tarefa).some(campo => tarefa[campo] !== r[campo])) {
+      if (r.motor !== Rust.VERSAO || !tarefa || r.execucao !== sessao.execucao || Object.keys(tarefa).some(campo => tarefa[campo] !== r[campo])) {
         throw new Error("Há partidas incompatíveis com o plano de coleta.");
       }
       const estado = Torneio.estadoInicial(r.posicao, r.semente);

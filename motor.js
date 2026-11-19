@@ -152,12 +152,15 @@ const Motor = (() => {
     if (!Number.isInteger(semente)) throw new Error("A semente deve ser inteira.");
     // Xorshift32 não aceita estado interno zero; a semente zero usa este valor fixo.
     let valor = (semente >>> 0) || 0x9e3779b9;
-    return function sortear() {
+    function sortear() {
       valor ^= valor << 13;
       valor ^= valor >>> 17;
       valor ^= valor << 5;
       return (valor >>> 0) / 4294967296;
-    };
+    }
+    sortear.lerEstado = () => valor >>> 0;
+    sortear.definirEstado = novo => { valor = novo >>> 0; };
+    return sortear;
   }
 
   return Object.freeze({ ADJACENCIAS, MOINHOS, criarEstado, copiarEstado,

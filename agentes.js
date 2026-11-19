@@ -1,6 +1,6 @@
 "use strict";
 
-const Agentes = (() => {
+const AgentesJavaScript = (() => {
   const HORIZONTE = 80;
   const EXPLORACAO = Math.SQRT2;
   const VITORIA = 10000;

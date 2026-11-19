@@ -14,7 +14,7 @@
 
   function abrirBanco() {
     return new Promise((resolver, rejeitar) => {
-      const pedido = indexedDB.open("trilha-protocolo-2026", 1);
+      const pedido = indexedDB.open("trilha-rust-wasm-1-2026", 1);
       pedido.onupgradeneeded = () => {
         const tabela = pedido.result.createObjectStore("dados", { keyPath: ["bloco", "id"] });
         tabela.createIndex("porBloco", "bloco");
@@ -131,8 +131,8 @@
       avisoArmazenamento();
     }
     sessao = memoria.get(bloco) ?? {
-      protocolo: Protocolo.VERSAO, bloco, execucao: new Date().toISOString(),
-      ambiente: navigator.userAgent, registros: []
+      protocolo: Protocolo.VERSAO, motor: Rust.VERSAO, bloco, execucao: new Date().toISOString(),
+      ambiente: Rust.VERSAO + " | " + navigator.userAgent, registros: []
     };
     memoria.set(bloco, sessao);
     ocupado = false;
@@ -201,7 +201,7 @@
   }
 
   function baixar(sufixo, texto, tipo) {
-    Relatorio.baixar("trilha-" + sessao.bloco + "-" + sufixo, texto, tipo);
+    Relatorio.baixar("trilha-rust-" + sessao.bloco + "-" + sufixo, texto, tipo);
   }
 
   obter("bloco").addEventListener("change", selecionarBloco);
@@ -213,7 +213,7 @@
   obter("jsonl").addEventListener("click", () => baixar("partidas.jsonl",
     sessao.registros.map(r => JSON.stringify(r)).join("\n") + "\n", "application/x-ndjson"));
   obter("csv").addEventListener("click", () => {
-    const colunas = [...Relatorio.COLUNAS, "etapa", "rotulo", "ordem", "sementeA", "sementeB",
+    const colunas = [...Relatorio.COLUNAS, "motor", "etapa", "rotulo", "ordem", "sementeA", "sementeB",
       "exploracao", "horizonte", "acimaDoPrazoA", "acimaDoPrazoB"];
     baixar("partidas.csv", Relatorio.paraCsv([colunas, ...sessao.registros.map(r => colunas.map(c => r[c]))]), "text/csv;charset=utf-8");
   });

@@ -2,7 +2,7 @@
 
 Projeto da disciplina de **Inteligência Artificial I** da FHO. Comparamos três algoritmos no jogo de tabuleiro Trilha, também conhecido como *Nine Men's Morris*. A pergunta do trabalho é como os agentes se comportam quando mudamos o orçamento de busca ou a posição inicial da partida.
 
-O projeto tem duas páginas. Em **Jogo**, você pode jogar contra a IA. Em **Torneio**, os agentes jogam entre si e o programa reúne os resultados em tabelas e gráficos. As duas páginas usam HTML, CSS e JavaScript e abrem diretamente no navegador.
+O projeto reúne jogo, torneio e apresentação. Em **Jogo**, você pode jogar contra a IA. Em **Torneio**, os agentes jogam entre si e o programa reúne os resultados em tabelas e gráficos. O jogo e o torneio usam HTML, CSS e JavaScript, com buscas em Rust compiladas para WebAssembly. As páginas abrem diretamente no navegador.
 
 ## Algoritmos comparados
 
@@ -18,7 +18,11 @@ Os três agentes usam o mesmo motor de regras. Ele gera as jogadas legais, aplic
 
 1. Baixe e extraia os arquivos do projeto. Mantenha os arquivos na mesma pasta.
 2. Abra [index.html](index.html) no Chrome ou Edge para jogar contra a IA.
-3. Abra [torneio.html](torneio.html) para executar um bloco ou consultar resultados já salvos.
+3. Abra [torneio.html](torneio.html) para coletar resultados com Rust/WebAssembly.
+4. Abra [apresentacao.html](apresentacao.html) para apresentar o trabalho.
+5. Para consultar ou continuar os JSONs JavaScript já coletados, abra [torneio_javascript.html](torneio_javascript.html). As pastas de resultados enviadas acompanham o pacote.
+
+A página de coleta identifica o motor usado. Use os arquivos antigos na página JavaScript e os novos na página Rust/WebAssembly. Detalhes de compilação e validação estão em [LEIA-ME_RUST.md](LEIA-ME_RUST.md).
 
 ## Protocolo experimental
 
@@ -46,8 +50,3 @@ Em **Torneio**, selecione **Piloto** e clique em **Iniciar bloco**. Ao concluir,
 - **JSONL** registra o histórico detalhado das partidas. O torneio principal também oferece um CSV com os valores-p.
 
 Se precisar interromper, clique em **Pausar** e baixe o JSON de progresso. Ao retomar, a partida interrompida começa de novo e as partidas concluídas são preservadas.
-
-## Autores
-
-Marcos Gabriel de Oliveira Favaretto, Lucas Lopes Pultz e João Pedro Bortolin  
-Engenharia da Computação · Fundação Hermínio Ometto (FHO)
