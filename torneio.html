@@ -11,19 +11,26 @@
   <header class="cabecalho">
     <div><h1>Coleta experimental de Trilha · Rust/WebAssembly</h1>
     <p class="introducao">Execute os blocos do artigo e exporte os resultados.</p></div>
-    <nav class="botoes"><a class="atalho" href="index.html">Jogo</a><a class="botao-apresentacao" href="apresentacao.html">Apresentação</a></nav>
+    <nav class="botoes"><a class="atalho" href="debug.html">Modo debug</a><a class="atalho" href="index.html">Jogo</a><a class="botao-apresentacao" href="apresentacao.html">Apresentação</a></nav>
   </header>
   <section class="cartao">
     <h2>Executar</h2>
     <label>Bloco
       <select id="bloco">
-        <option value="piloto">Piloto — 60 partidas</option>
-        <option value="principal">Principal — 30 de aquecimento + 600 avaliadas</option>
-        <option value="fixo">Esforço fixo — 600 partidas</option>
-        <option value="ablacoes">Ablações — 600 partidas</option>
-        <option value="posicoes">Posições iniciais — 480 partidas</option>
+        <option value="piloto">Piloto</option>
+        <option value="principal">Principal</option>
+        <option value="fixo">Esforço fixo</option>
+        <option value="ablacoes">Ablações</option>
+        <option value="posicoes">Posições iniciais</option>
       </select>
     </label>
+    <fieldset>
+      <legend>Agentes da coleta</legend>
+      <label><input type="checkbox" name="agente-coleta" value="mcts" checked> MCTS / UCT</label>
+      <label><input type="checkbox" name="agente-coleta" value="minimax" checked> Minimax alfa-beta</label>
+      <label><input type="checkbox" name="agente-coleta" value="monteCarlo" checked> Monte Carlo plano</label>
+      <p id="agentes-aviso" class="nota"></p>
+    </fieldset>
     <p>Mantenha a aba visível durante a execução. Use o mesmo computador e navegador para comparar tempos.</p>
     <div class="botoes">
       <button id="executar" type="button" disabled>Iniciar bloco</button>
@@ -31,6 +38,7 @@
     </div>
     <p id="situacao" role="status">Abrindo a coleta...</p>
     <progress id="progresso" value="0" max="1" aria-label="Partidas concluídas"></progress>
+    <span id="total-partidas" class="nota"></span>
     <p id="armazenamento" class="nota"></p>
   </section>
   <section class="cartao">

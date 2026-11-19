@@ -3,6 +3,8 @@
 (() => {
   const obter = id => document.getElementById(id);
   const chave = Relatorio.identificador;
+  const opcoes = [...document.querySelectorAll("[name=agente-coleta]")];
+  const selecionados = () => opcoes.filter(campo => campo.checked).map(campo => campo.value);
   const PAUSA = Symbol("pausa");
   const memoria = new Map();
   let banco;
@@ -75,15 +77,24 @@
   }
 
   function atualizar() {
-    const total = Protocolo.criarPlano(sessao?.bloco ?? obter("bloco").value).length;
+    const algoritmos = sessao?.algoritmos ?? Protocolo.ALGORITMOS;
+    const total = Protocolo.criarPlano(sessao?.bloco ?? obter("bloco").value, algoritmos).length;
     const feitas = sessao?.registros.length ?? 0;
     obter("progresso").max = total;
     obter("progresso").value = feitas;
+    obter("total-partidas").textContent = total + " partidas previstas.";
     obter("executar").textContent = feitas ? "Retomar bloco" : "Iniciar bloco";
     obter("executar").disabled = ocupado || feitas === total;
     obter("pausar").disabled = !ocupado || pausa;
     obter("bloco").disabled = ocupado;
     obter("arquivo").disabled = ocupado;
+    for (const campo of opcoes) {
+      campo.checked = algoritmos.includes(campo.value);
+      campo.disabled = ocupado || feitas > 0;
+    }
+    obter("agentes-aviso").textContent = feitas
+      ? "Os agentes ficam fixos neste bloco após a primeira partida."
+      : "Selecione pelo menos dois agentes.";
     for (const id of ["json", "jsonl", "csv"]) obter(id).disabled = !feitas;
   }
 
@@ -95,7 +106,7 @@
   function mostrarResultados() {
     const avaliadas = sessao.registros.filter(r => r.etapa !== "aquecimento");
     grupos = Relatorio.resumir(avaliadas);
-    testes = Protocolo.significancia(avaliadas);
+    testes = Protocolo.significancia(avaliadas, sessao.algoritmos);
     obter("tabelas").innerHTML = grupos.length ? Relatorio.tabelasHtml(grupos) : "";
     obter("significancia").innerHTML = testes.length ?
       "<h3>Permutação bilateral por pares e correção de Holm</h3>" +
@@ -150,7 +161,7 @@
     ocupado = true;
     pausa = false;
     atualizar();
-    const plano = Protocolo.criarPlano(sessao.bloco);
+    const plano = Protocolo.criarPlano(sessao.bloco, sessao.algoritmos);
     const feitas = new Set(sessao.registros.map(chave));
     try {
       await gravar([metadados()]);
@@ -204,6 +215,14 @@
     Relatorio.baixar("trilha-rust-" + sessao.bloco + "-" + sufixo, texto, tipo);
   }
 
+  for (const campo of opcoes) {
+    campo.addEventListener("change", () => {
+      const algoritmos = selecionados();
+      if (algoritmos.length >= 2) sessao.algoritmos = algoritmos;
+      atualizar();
+    });
+  }
+
   obter("bloco").addEventListener("change", selecionarBloco);
   obter("executar").addEventListener("click", executar);
   obter("pausar").addEventListener("click", () => { pausa = true; obter("pausar").disabled = true; });
@@ -213,8 +232,7 @@
   obter("jsonl").addEventListener("click", () => baixar("partidas.jsonl",
     sessao.registros.map(r => JSON.stringify(r)).join("\n") + "\n", "application/x-ndjson"));
   obter("csv").addEventListener("click", () => {
-    const colunas = [...Relatorio.COLUNAS, "motor", "etapa", "rotulo", "ordem", "sementeA", "sementeB",
-      "exploracao", "horizonte", "acimaDoPrazoA", "acimaDoPrazoB"];
+    const colunas = Relatorio.COLUNAS_COLETA;
     baixar("partidas.csv", Relatorio.paraCsv([colunas, ...sessao.registros.map(r => colunas.map(c => r[c]))]), "text/csv;charset=utf-8");
   });
   obter("resumo").addEventListener("click", () =>

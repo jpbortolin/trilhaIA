@@ -135,3 +135,77 @@ progress { width: 100%; }
   .lateral { grid-template-columns: 1fr; }
   .cartao { padding: 20px; }
 }
+
+.pagina-debug main { max-width: 1500px; }
+.debug-resumo { display: inline-flex; gap: 8px; align-items: center; font-weight: bold; }
+#debug-linha { min-height: 1.6em; margin: 4px 0 8px; }
+.debug-controles { margin-top: 18px; }
+.debug-grade { display: grid; grid-template-columns: minmax(230px, 0.8fr) minmax(0, 1.2fr); gap: 20px; margin-top: 16px; }
+#debug-tabuleiro { display: block; width: min(100%, 500px); background: #eef0e3; border-radius: 8px; }
+#debug-tabuleiro text { font: bold 21px system-ui, sans-serif; fill: #173328; }
+#debug-tabuleiro .debug-numero-claro { fill: #fffdf2; }
+.debug-casa { stroke: #476451; stroke-width: 2; }
+.debug-dono-0 { fill: #eef0e3; }
+.debug-dono-1 { fill: #1756a1; stroke: #103b71; }
+.debug-dono-2 { fill: #873b23; stroke: #612714; }
+.debug-legenda { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; font-size: 13px; }
+.debug-legenda span { display: inline-flex; align-items: center; gap: 5px; }
+.debug-legenda i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
+.debug-legenda .debug-dono-1 { background: #1756a1; }
+.debug-legenda .debug-dono-2 { background: #873b23; }
+.debug-casa.debug-destino { stroke: #956200; stroke-width: 6; }
+.debug-casa.debug-remocao { stroke: #a43127; stroke-width: 6; }
+.debug-arvore { position: relative; height: 85dvh; overflow: auto; border: 1px solid #cbd6c7; border-radius: 6px; background: #f0f3ea; }
+.debug-zoom { gap: 8px; }
+.debug-zoom output { min-width: 5ch; text-align: center; font-variant-numeric: tabular-nums; }
+#debug-navegacao { margin-bottom: 8px; }
+.debug-arvore { cursor: grab; touch-action: none; user-select: none; }
+.debug-arvore.debug-arrastando, .debug-arvore.debug-arrastando * { cursor: grabbing; }
+.debug-area-diagrama { position: relative; margin-inline: auto; overflow: clip; }
+.debug-diagrama { position: relative; transform-origin: top left; }
+.debug-conexoes { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; stroke: #6e8776; stroke-width: 1.5; pointer-events: none; }
+.debug-ramo { position: absolute; display: flex; gap: 2px; align-items: center; padding: 2px; background: #fafbf7; border: 1px solid #aabbb0; border-radius: 8px; }
+.debug-ramo.debug-ativo { border: 2px solid #956200; }
+.pagina-jogo .debug-ramo button { min-height: 0; padding: 0 2px; height: 100%; background: transparent; color: #214334; font-size: 11px; text-align: center; }
+.pagina-jogo .debug-ramo .debug-inspecionar { flex: 1; min-width: 0; white-space: nowrap; }
+.pagina-jogo .debug-ramo .debug-expandir { flex: 0 0 18px; background: #e8eedf; }
+.debug-tooltip { position: fixed; z-index: 20; max-width: min(320px, calc(100vw - 16px)); padding: 7px 10px; border-radius: 6px; background: #214334; color: white; pointer-events: none; font-size: 12px; }
+#debug-status { margin: 8px 0 0; }
+.pagina-jogo .debug-ramo button[aria-pressed="true"] { background: #2b5948; color: white; }
+@media (max-width: 750px) { .debug-grade { grid-template-columns: minmax(0, 1fr); } }
+
+.debug-em-tela-cheia { overflow: hidden; }
+.debug-em-tela-cheia .cabecalho,
+.debug-em-tela-cheia .cartao > p,
+.debug-em-tela-cheia #debug-config,
+.debug-em-tela-cheia #debug-vivo,
+.debug-em-tela-cheia #debug-lider,
+.debug-em-tela-cheia #debug-etapa,
+.debug-em-tela-cheia #debug-linha,
+.debug-em-tela-cheia .debug-zoom,
+.debug-em-tela-cheia #debug-navegacao { display: none; }
+.debug-em-tela-cheia #debug-partida {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 10px;
+  padding: clamp(10px, 2vw, 24px);
+  background: #fafbf7;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+.debug-em-tela-cheia .debug-controles,
+.debug-em-tela-cheia .debug-grade { margin: 0; }
+.debug-em-tela-cheia .debug-grade { grid-template-columns: minmax(210px, 30%) minmax(0, 1fr); }
+.debug-em-tela-cheia .debug-grade > div { min-width: 0; min-height: 0; }
+.debug-em-tela-cheia .debug-grade > div:first-child { display: flex; flex-direction: column; }
+.debug-em-tela-cheia #debug-tabuleiro { min-height: 0; max-height: 100%; }
+.debug-em-tela-cheia .debug-grade > div:last-child { display: flex; flex-direction: column; gap: 6px; }
+.debug-em-tela-cheia .debug-arvore { flex: 1; min-height: 0; height: auto; }
+@media (max-width: 750px) and (orientation: portrait) {
+  .debug-em-tela-cheia .debug-grade { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 35%) minmax(0, 1fr); gap: 8px; }
+  .debug-em-tela-cheia #debug-tabuleiro { width: auto; max-width: 100%; align-self: center; }
+}

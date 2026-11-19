@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trilha — Modo debug</title>
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body class="pagina-jogo pagina-torneio pagina-debug">
+<main>
+  <header class="cabecalho">
+    <div><h1>Modo debug · Trilha</h1>
+    <p class="introducao">Inspecione a busca dos dois jogadores, turno a turno.</p></div>
+    <nav class="botoes"><a class="atalho" href="torneio.html">Voltar ao torneio</a></nav>
+  </header>
+  <section class="cartao" aria-label="Partida de inspeção">
+    <p>Partida de inspeção em JavaScript. Escolha o agente de cada lado e acompanhe a busca com orçamento fixo. A partida fica disponível para revisão nesta página.</p>
+    <form id="debug-config" class="campos-torneio">
+      <label>Jogador 1 <select id="debug-j1"></select></label>
+      <label>Jogador 2 <select id="debug-j2"></select></label>
+      <label>Posição inicial <select id="debug-posicao">
+        <option value="vazio">Tabuleiro vazio</option>
+        <option value="abertura">Abertura</option>
+        <option value="meio">Meio-jogo</option>
+        <option value="final">Final</option>
+      </select></label>
+      <label>Simulações / iterações <input id="debug-iteracoes" type="number" min="1" max="1000" value="100" required></label>
+      <label>Profundidade do Minimax <input id="debug-profundidade" type="number" min="1" max="3" value="2" required></label>
+      <div class="botoes"><button type="submit">Iniciar partida debug</button></div>
+    </form>
+    <div id="debug-partida" hidden>
+      <div class="botoes debug-controles">
+        <button id="debug-passo" type="button">Próximo passo</button>
+        <button id="debug-jogada" type="button">Concluir jogada</button>
+        <button id="debug-auto" type="button">Executar automaticamente</button>
+        <button id="debug-tela-cheia" type="button" aria-pressed="false">Tela cheia</button>
+      </div>
+      <div class="botoes">
+        <label>Partida debug <select id="debug-historico"></select></label>
+        <label>Busca do turno <select id="debug-turno"></select></label>
+        <button id="debug-vivo" type="button">Acompanhar busca</button>
+      </div>
+      <div class="debug-grade">
+        <div>
+          <div class="debug-legenda">
+            <span><i class="debug-dono-1" aria-hidden="true"></i> Jogador 1</span>
+            <span><i class="debug-dono-2" aria-hidden="true"></i> Jogador 2</span>
+          </div>
+          <svg id="debug-tabuleiro" viewBox="0 0 640 640" role="img" aria-label="Tabuleiro numerado"></svg>
+          <p id="debug-status" role="status"></p>
+        </div>
+        <div>
+          <p id="debug-lider"></p>
+          <p id="debug-etapa"></p>
+          <div class="botoes debug-opcoes-arvore">
+            <label class="debug-resumo"><input id="debug-resumo" type="checkbox" checked> Resumo da árvore</label>
+            <button id="debug-expandir-tudo" type="button">Expandir toda a árvore</button>
+          </div>
+          <p id="debug-linha" class="nota"></p>
+          <div class="botoes debug-zoom" role="group" aria-label="Zoom da árvore">
+            <button id="debug-menos" type="button" aria-label="Diminuir zoom">−</button>
+            <output id="debug-zoom">100%</output>
+            <button id="debug-mais" type="button" aria-label="Aumentar zoom">+</button>
+            <button id="debug-repor" type="button">Restaurar visão</button>
+          </div>
+          <p id="debug-navegacao" class="nota">Arraste para mover a árvore e use a roda do mouse para ajustar o zoom.</p>
+          <div id="debug-arvore" class="debug-arvore" role="region" tabindex="0"
+            aria-label="Árvore de busca" aria-describedby="debug-navegacao"></div>
+          <div id="debug-tooltip" class="debug-tooltip" role="tooltip" hidden></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="motor.js"></script>
+<script src="agentes.js"></script>
+<script src="relatorio.js"></script>
+<script src="torneio.js"></script>
+<script src="protocolo.js"></script>
+<script src="debug.js"></script>
+</body>
+</html>
