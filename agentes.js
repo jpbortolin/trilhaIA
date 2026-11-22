@@ -1,6 +1,6 @@
 "use strict";
 
-const Agentes = (() => {
+const AgentesJavaScript = (() => {
   const HORIZONTE = 80;
   const EXPLORACAO = Math.SQRT2;
   const VITORIA = 10000;
@@ -97,30 +97,45 @@ const Agentes = (() => {
     return sucessores.sort((primeiro, segundo) => segundo.valor - primeiro.valor);
   }
 
-  function buscar(estado, profundidade, alfa, beta, jogador, controle) {
+  function* buscar(estado, profundidade, alfa, beta, jogador, controle, no, pai, acao) {
+    const { debug } = controle;
+    if (debug) yield { etapa: "Visita", no, pai, acao, alfa, beta };
     conferirPrazo(controle);
     controle.estatisticas.nos++;
     if (Motor.resultado(estado) || profundidade === 0) {
-      return { valor: avaliar(estado, jogador), acao: null };
+      const valor = avaliar(estado, jogador);
+      if (debug) yield { etapa: "Avaliação", no, valor };
+      return { valor, acao: null };
     }
     const maximizar = estado.jogador === jogador;
     let valor = maximizar ? -Infinity : Infinity;
     let melhor = null;
-    for (const sucessor of ordenar(estado, controle)) {
-      const resposta = buscar(sucessor.estado, profundidade - 1, alfa, beta, jogador, controle);
+    let melhorFilho;
+    const sucessores = ordenar(estado, controle);
+    for (const [indice, sucessor] of sucessores.entries()) {
+      const filho = debug ? ++debug.ultimo : undefined;
+      const resposta = yield* buscar(sucessor.estado, profundidade - 1, alfa, beta, jogador,
+        controle, filho, no, sucessor.acao);
       if (melhor === null || (maximizar ? resposta.valor > valor : resposta.valor < valor)) {
         valor = resposta.valor;
         melhor = sucessor.acao;
+        melhorFilho = filho;
       }
       if (maximizar) alfa = Math.max(alfa, valor);
       else beta = Math.min(beta, valor);
-      if (alfa >= beta) break;
+      const poda = alfa >= beta;
+      if (debug) yield { etapa: poda ? "Poda alfa-beta" : "Retorno", no, valor,
+        alfa, beta, melhorFilho, cortados: poda ? sucessores.length - indice - 1 : 0,
+        lideres: no === 0 ? [melhor] : undefined };
+      if (poda) break;
     }
     return { valor, acao: melhor };
   }
 
-  function escolherMinimax(estado, opcoes = {}) {
+  function* escolherMinimax(estado, opcoes = {}) {
     const controle = preparar(opcoes);
+    const debug = opcoes.debug ? { ultimo: 0 } : null;
+    controle.debug = debug;
     const acoes = Motor.gerarAcoes(estado);
     if (!acoes.length) return terminar(null, controle);
     let melhor = acoes[0];
@@ -128,7 +143,7 @@ const Agentes = (() => {
     const primeira = controle.temporizado ? 1 : controle.profundidade;
     try {
       for (let profundidade = primeira; profundidade <= controle.profundidade; profundidade++) {
-        const resposta = buscar(estado, profundidade, -Infinity, Infinity, estado.jogador, controle);
+        const resposta = yield* buscar(estado, profundidade, -Infinity, Infinity, estado.jogador, controle, 0, null, null);
         conferirPrazo(controle);
         // Só substitui a decisão depois de concluir toda a profundidade.
         melhor = resposta.acao;
@@ -144,11 +159,15 @@ const Agentes = (() => {
     return terminar(melhor, controle);
   }
 
-  function escolherMonteCarlo(estado, opcoes = {}) {
+  function* escolherMonteCarlo(estado, opcoes = {}) {
     const controle = preparar(opcoes);
+    const debug = opcoes.debug ? { ultimo: 0 } : null;
+    controle.debug = debug;
     const acoes = Motor.gerarAcoes(estado);
     if (!acoes.length) return terminar(null, controle);
-    const registros = acoes.map(acao => ({ acao, visitas: 0, soma: 0 }));
+    const registros = acoes.map((acao, indice) => ({ acao, visitas: 0, soma: 0, id: indice + 1 }));
+    if (debug) yield { etapa: "Ações candidatas", no: 0,
+      atualizacoes: registros.map(r => ({ no: r.id, pai: 0, acao: r.acao, visitas: 0 })) };
     const limite = controle.temporizado ? Infinity : controle.iteracoes;
     try {
       while (controle.estatisticas.simulacoes < limite) {
@@ -163,6 +182,10 @@ const Agentes = (() => {
           controle.estatisticas.simulacoes++;
           controle.estatisticas.iteracoes++;
           controle.estatisticas.truncadas += Number(resposta.truncada);
+          if (debug) yield { etapa: "Simulação", no: registro.id, visitas: registro.visitas,
+            valor: mediaDeRecompensa(registro), ...resposta,
+            lideres: lideres(registros.filter(r => r.visitas), mediaDeRecompensa),
+            cobertura: registros.filter(r => r.visitas).length / registros.length };
         }
       }
     } catch (erro) {
@@ -187,7 +210,7 @@ const Agentes = (() => {
     return no.soma / no.visitas;
   }
 
-  function escolherMelhor(lista, pontuar, sortear) {
+  function candidatosMelhores(lista, pontuar) {
     let maior = -Infinity;
     let candidatos = [];
     for (const item of lista) {
@@ -197,21 +220,38 @@ const Agentes = (() => {
         candidatos = [item];
       } else if (valor === maior) candidatos.push(item);
     }
-    return escolher(candidatos, sortear);
+    return candidatos;
+  }
+
+  function escolherMelhor(lista, pontuar, sortear) {
+    return escolher(candidatosMelhores(lista, pontuar), sortear);
+  }
+
+  function lideres(lista, pontuar) {
+    return candidatosMelhores(lista, pontuar).map(item => item.acao);
+  }
+
+  function lideresMcts(raiz) {
+    const maisVisitados = candidatosMelhores(raiz.filhos, filho => filho.visitas);
+    return lideres(maisVisitados, mediaDeRecompensa);
   }
 
   function selecionar(no, jogador, sortear, exploracao = EXPLORACAO) {
-    // No turno adversário, uma recompensa alta para a raiz é ruim para ele.
-    return escolherMelhor(no.filhos, filho => {
-      const media = mediaDeRecompensa(filho);
-      const recompensa = no.estado.jogador === jogador ? media : 1 - media;
-      return recompensa + exploracao * Math.sqrt(Math.log(no.visitas) / filho.visitas);
-    }, sortear);
+    return escolherMelhor(no.filhos, filho => pontuarUct(no, filho, jogador, exploracao), sortear);
   }
 
-  function escolherMcts(estado, opcoes = {}) {
+  function pontuarUct(no, filho, jogador, exploracao) {
+    const media = mediaDeRecompensa(filho);
+    const recompensa = no.estado.jogador === jogador ? media : 1 - media;
+    return recompensa + exploracao * Math.sqrt(Math.log(no.visitas) / filho.visitas);
+  }
+
+  function* escolherMcts(estado, opcoes = {}) {
     const controle = preparar(opcoes);
+    const debug = opcoes.debug ? { ultimo: 0 } : null;
+    controle.debug = debug;
     const raiz = criarNo(estado);
+    raiz.id = 0;
     controle.estatisticas.nos = 1;
     if (!raiz.pendentes.length) return terminar(null, controle);
     const acoes = raiz.pendentes.slice();
@@ -224,7 +264,10 @@ const Agentes = (() => {
         const caminho = [no];
         while (!no.pendentes.length && no.filhos.length) {
           conferirPrazo(controle);
+          const paiSelecao = no;
           no = selecionar(no, estado.jogador, controle.sortear, controle.exploracao);
+          if (debug) yield { etapa: "Seleção UCT", no: no.id,
+            uct: pontuarUct(paiSelecao, no, estado.jogador, controle.exploracao) };
           caminho.push(no);
         }
         // 2. Expansão: preparar um filho para uma ação ainda não explorada.
@@ -236,10 +279,15 @@ const Agentes = (() => {
           const acao = pai.pendentes[indice];
           no = criarNo(Motor.aplicarAcao(pai.estado, acao, false), acao, pai.profundidade + 1);
           caminho.push(no);
+          if (debug) {
+            no.id = ++debug.ultimo;
+            yield { etapa: "Expansão", no: no.id, pai: pai.id, acao, visitas: 0 };
+          }
         }
         // 3. Simulação: jogar ao acaso a partir do nó alcançado.
         const resposta = simular(no.estado, estado.jogador, controle);
         conferirPrazo(controle);
+        if (debug) yield { etapa: "Simulação", no: no.id, ...resposta };
         // 4. Retropropagação: confirmar o filho e atualizar o caminho após a simulação.
         if (pai) {
           pai.pendentes.splice(indice, 1);
@@ -254,6 +302,8 @@ const Agentes = (() => {
         controle.estatisticas.simulacoes++;
         controle.estatisticas.truncadas += Number(resposta.truncada);
         controle.estatisticas.profundidade = Math.max(controle.estatisticas.profundidade, no.profundidade);
+        if (debug) yield { etapa: "Retropropagação", no: no.id, lideres: lideresMcts(raiz),
+          atualizacoes: caminho.map(item => ({ no: item.id, visitas: item.visitas, valor: mediaDeRecompensa(item) })) };
       }
     } catch (erro) {
       if (erro !== PRAZO_ESGOTADO) throw erro;
@@ -271,9 +321,22 @@ const Agentes = (() => {
     return terminar(acoes.length ? escolher(acoes, controle.sortear) : null, controle);
   }
 
-  return Object.freeze({ avaliar, selecionar,
-    mcts: Object.freeze({ escolherAcao: escolherMcts }),
-    minimax: Object.freeze({ escolherAcao: escolherMinimax }),
-    monteCarlo: Object.freeze({ escolherAcao: escolherMonteCarlo }),
+  const buscas = { mcts: escolherMcts, minimax: escolherMinimax, monteCarlo: escolherMonteCarlo };
+
+  function agente(busca) {
+    return Object.freeze({ escolherAcao(estado, opcoes) {
+      const passos = busca(estado, opcoes);
+      let passo = passos.next();
+      while (!passo.done) passo = passos.next();
+      return passo.value;
+    } });
+  }
+
+  function depurar(nome, estado, opcoes) {
+    return buscas[nome](estado, { ...opcoes, limiteMs: undefined, debug: true });
+  }
+
+  return Object.freeze({ avaliar, selecionar, depurar,
+    mcts: agente(escolherMcts), minimax: agente(escolherMinimax), monteCarlo: agente(escolherMonteCarlo),
     aleatorio: Object.freeze({ escolherAcao: escolherAleatorio }) });
 })();

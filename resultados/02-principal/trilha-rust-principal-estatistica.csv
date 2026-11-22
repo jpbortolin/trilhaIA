@@ -1,0 +1,4 @@
+﻿"Confronto","p bilateral","p ajustado (Holm)","p ajustado ≤ 0,05"
+"MCTS × Minimax","2.5849394142282115e-26","5.169878828456423e-26","Sim"
+"MCTS × Monte Carlo","0.0010158471941252856","0.0010158471941252856","Sim"
+"Minimax × Monte Carlo","1.0097419586828951e-28","3.0292258760486853e-28","Sim"

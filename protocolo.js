@@ -3,7 +3,7 @@
 const Protocolo = (() => {
   const CONFRONTOS = [["mcts", "minimax"], ["mcts", "monteCarlo"], ["minimax", "monteCarlo"]];
   const SEMENTE_BASE = 2026;
-  const VERSAO = 1;
+  const VERSAO = 2;
   const BASE = { iteracoesMcts: 1000, iteracoesMonteCarlo: 1000,
     profundidadeMinimax: 4, exploracao: Math.SQRT2, horizonte: 80 };
   const VARIANTES = [
@@ -44,11 +44,18 @@ const Protocolo = (() => {
     return lista;
   }
 
-  function criarPlano(bloco) {
+  const ALGORITMOS = Object.freeze([...new Set(CONFRONTOS.flat())]);
+
+  function criarPlano(bloco, algoritmos = ALGORITMOS) {
+    if (!Array.isArray(algoritmos) || new Set(algoritmos).size !== algoritmos.length ||
+        algoritmos.length < 2 || algoritmos.some(nome => !ALGORITMOS.includes(nome))) {
+      throw new Error("Selecione pelo menos dois algoritmos diferentes.");
+    }
+    const confrontos = CONFRONTOS.filter(par => par.every(nome => algoritmos.includes(nome)));
     const sortear = Motor.criarGerador(Relatorio.sementeDoTexto(SEMENTE_BASE + "|ordem|" + bloco));
     return condicoes(bloco).flatMap(({ pares, ...cenario }) => {
       const paresDePartidas = [];
-      for (const [agenteA, agenteB] of CONFRONTOS) {
+      for (const [agenteA, agenteB] of confrontos) {
         const confronto = Relatorio.NOMES[agenteA] + " × " + Relatorio.NOMES[agenteB];
         for (let par = 1; par <= pares; par++) {
           // As condições de teste usam sementes comuns. Piloto e aquecimento usam fluxos próprios.
@@ -93,8 +100,9 @@ const Protocolo = (() => {
     return ajustados;
   }
 
-  function significancia(registros) {
-    const grupos = CONFRONTOS.map(([a, b]) => {
+  function significancia(registros, algoritmos = ALGORITMOS) {
+    const confrontos = CONFRONTOS.filter(par => par.every(nome => algoritmos.includes(nome)));
+    const grupos = confrontos.map(([a, b]) => {
       const pares = new Map();
       for (const r of registros) {
         if (r.etapa !== "principal" || r.agenteA !== a || r.agenteB !== b) continue;
@@ -102,7 +110,7 @@ const Protocolo = (() => {
       }
       return { a, b, pares };
     });
-    if (registros.filter(r => r.etapa === "principal").length !== 600 || grupos.some(g => g.pares.size !== 100)) return [];
+    if (registros.filter(r => r.etapa === "principal").length !== 200 * confrontos.length || grupos.some(g => g.pares.size !== 100)) return [];
     const valores = grupos.map(g => permutacao([...g.pares.values()]));
     const ajustados = holm(valores);
     return grupos.map((g, i) => ({ confronto: Relatorio.NOMES[g.a] + " × " + Relatorio.NOMES[g.b],
@@ -124,13 +132,13 @@ const Protocolo = (() => {
   }
 
   function validar(sessao) {
-    if (!sessao || sessao.protocolo !== VERSAO || typeof sessao.execucao !== "string" ||
+    if (!sessao || sessao.motor !== Rust.VERSAO || sessao.protocolo !== VERSAO || typeof sessao.execucao !== "string" ||
         !sessao.execucao || typeof sessao.ambiente !== "string") throw new Error("Arquivo de coleta inválido.");
-    const plano = new Map(criarPlano(sessao.bloco).map(tarefa => [Relatorio.identificador(tarefa), tarefa]));
+    const plano = new Map(criarPlano(sessao.bloco, sessao.algoritmos).map(tarefa => [Relatorio.identificador(tarefa), tarefa]));
     Relatorio.validarRegistros(sessao.registros);
     for (const r of sessao.registros) {
       const tarefa = plano.get(Relatorio.identificador(r));
-      if (!tarefa || r.execucao !== sessao.execucao || Object.keys(tarefa).some(campo => tarefa[campo] !== r[campo])) {
+      if (r.motor !== Rust.VERSAO || !tarefa || r.execucao !== sessao.execucao || Object.keys(tarefa).some(campo => tarefa[campo] !== r[campo])) {
         throw new Error("Há partidas incompatíveis com o plano de coleta.");
       }
       const estado = Torneio.estadoInicial(r.posicao, r.semente);
@@ -145,5 +153,5 @@ const Protocolo = (() => {
     return sessao;
   }
 
-  return Object.freeze({ VERSAO, SEMENTE_BASE, criarPlano, permutacao, holm, significancia, validar });
+  return Object.freeze({ VERSAO, SEMENTE_BASE, ALGORITMOS, criarPlano, permutacao, holm, significancia, validar });
 })();

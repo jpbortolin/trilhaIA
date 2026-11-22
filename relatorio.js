@@ -10,6 +10,9 @@ const Relatorio = (() => {
     "simulacoesA", "simulacoesB", "profundidadeMediaA", "profundidadeMediaB", "truncadasA", "truncadasB",
     "coberturaInsuficienteA", "coberturaInsuficienteB"];
   const CAMPOS_PRAZO = ["acimaDoPrazoA", "acimaDoPrazoB"];
+  const COLUNAS_COLETA = Object.freeze([...COLUNAS, "motor", "etapa", "rotulo", "ordem", "sementeA", "sementeB",
+    "exploracao", "horizonte", ...CAMPOS_PRAZO]);
+  const TEXTOS_COLETA = new Set(["motor", "etapa", "rotulo"]);
   const TEXTOS = new Set(["execucao", "confronto", "bloco", "cenario", "posicao", "agenteA", "agenteB",
     "quemComecou", "resultado", "motivo", "chaveInicial"]);
   const MOTIVOS = ["menos de três peças", "sem movimentos", "terceira repetição", "100 turnos sem captura", "limite de 400 turnos"];
@@ -57,13 +60,14 @@ const Relatorio = (() => {
     const linhas = lerLinhasCsv(texto);
     const [colunas, ...dados] = linhas;
     const cabecalho = JSON.stringify(colunas);
-    if (cabecalho !== JSON.stringify(COLUNAS) && cabecalho !== JSON.stringify([...COLUNAS, ...CAMPOS_PRAZO])) {
+    if (cabecalho !== JSON.stringify(COLUNAS) && cabecalho !== JSON.stringify([...COLUNAS, ...CAMPOS_PRAZO]) &&
+        cabecalho !== JSON.stringify(COLUNAS_COLETA)) {
       throw new Error("Use o CSV de partidas exportado por esta versão do projeto.");
     }
     const registros = dados.map(linha => {
       if (linha.length !== colunas.length) throw new Error("Linha CSV incompleta.");
       return Object.fromEntries(colunas.map((coluna, i) => [coluna,
-        TEXTOS.has(coluna) ? linha[i] : linha[i] === "" ? null : Number(linha[i])]));
+        (TEXTOS.has(coluna) || TEXTOS_COLETA.has(coluna)) ? linha[i] : linha[i] === "" ? null : Number(linha[i])]));
     });
     return validarRegistros(registros);
   }
@@ -295,7 +299,7 @@ const Relatorio = (() => {
     setTimeout(() => URL.revokeObjectURL(endereco), 1000);
   }
 
-  return Object.freeze({ REAMOSTRAGENS, NOMES, COLUNAS, escapar, numero, identificador, sementeDoTexto,
+  return Object.freeze({ REAMOSTRAGENS, NOMES, COLUNAS, COLUNAS_COLETA, escapar, numero, identificador, sementeDoTexto,
     exportarCsv, importarCsv, validarRegistros, intervalo, nomeCenario, resumir, linhasTabela,
     paraCsv, tabelaHtml, tabelasHtml, markdown, criarGraficos, baixar });
 })();
