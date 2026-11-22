@@ -228,63 +228,9 @@
       </div>
     </section>
 
-    <!-- 3. Motivação -->
-    <section class="slide" aria-label="Motivação e pergunta de pesquisa">
-      <p class="sobretitulo">Motivação</p>
-      <h2>Por que estudar um jogo já resolvido?</h2>
-      <div class="colunas c2" style="flex:none;margin-bottom:34px">
-        <div class="cartao">
-          <span class="rotulo">Gasser, 1996</span>
-          <p>Demonstrou o <strong>empate sob jogo perfeito</strong>, combinando busca e bases de finais.</p>
-        </div>
-        <div class="cartao">
-          <span class="rotulo">Mas…</span>
-          <p>A cada turno, nossos agentes calculam a jogada em <strong>poucos milissegundos</strong>. Eles jogam sem consultar tabelas de finais já resolvidos ou listas de jogadas recomendadas para o começo.</p>
-        </div>
-      </div>
-      <p class="sobretitulo">Pergunta de pesquisa</p>
-      <p class="destaque">Sob um mesmo orçamento de tempo por decisão, como MCTS/UCT se compara a Minimax com alfa-beta e a Monte Carlo plano no Trilha — e como essa comparação varia com o esforço de busca?</p>
-    </section>
-
-    <!-- 4. Objetivos -->
-    <section class="slide" aria-label="Objetivos">
-      <p class="sobretitulo">Objetivos</p>
-      <h2>O que desenvolvemos e avaliamos</h2>
-      <div class="colunas c2">
-        <div>
-          <span class="tag">Objetivo geral</span>
-          <p style="margin-top:16px;font-family:Georgia,serif;font-size:28px;line-height:1.4;color:var(--tinta)">Desenvolver e avaliar, com interface JavaScript e busca em Rust/WebAssembly, um ambiente <strong>reprodutível</strong> de confronto entre os três agentes.</p>
-          <p class="nota" style="margin-top:20px">A comparação considera o protocolo, os adversários e os recursos. As conclusões se limitam às condições avaliadas.</p>
-        </div>
-        <div>
-          <span class="tag">Objetivos específicos</span>
-          <ol style="margin-top:16px">
-            <li>Formalizar as regras e a representação do estado</li>
-            <li>Implementar um motor compartilhado e os três agentes</li>
-            <li>Produzir registros auditáveis das partidas</li>
-            <li>Comparar pontuação, vitórias, empates, derrotas e custo computacional</li>
-            <li>Analisar parâmetros de busca e diferentes posições iniciais</li>
-          </ol>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5. Trabalhos relacionados -->
-    <section class="slide" aria-label="Trabalhos relacionados">
-      <p class="sobretitulo">Trabalhos relacionados</p>
-      <h2>O que cada trabalho explica no nosso projeto</h2>
-      <div class="colunas c3 fontes">
-        <div class="cartao"><span class="rotulo">Gasser [1] · 1996</span><p><strong>O que fez.</strong> Calculou finais de trás para frente e usou esses resultados para provar o empate sob jogo perfeito.</p><p><strong>No projeto.</strong> Comparamos decisões tomadas na hora, com tempo limitado.</p></div>
-        <div class="cartao"><span class="rotulo">Knuth &amp; Moore [2] · 1975</span><p><strong>O que fizeram.</strong> Provaram quando pular ramos da busca preserva o resultado do Minimax.</p><p><strong>No projeto.</strong> É a poda alfa-beta que reduz o trabalho do nosso Minimax.</p></div>
-        <div class="cartao"><span class="rotulo">Kocsis &amp; Szepesvári [3] · 2006</span><p><strong>O que fizeram.</strong> Criaram o UCT para revisitar boas opções e dar chances às pouco exploradas.</p><p><strong>No projeto.</strong> O UCT decide qual ramo o MCTS pesquisa a seguir.</p></div>
-        <div class="cartao"><span class="rotulo">Browne et al. [4] · 2012</span><p><strong>O que fizeram.</strong> Revisaram como o MCTS cresce uma árvore e aprende com simulações.</p><p><strong>No projeto.</strong> Seguimos seu esquema de quatro etapas e escolhemos o filho mais visitado.</p></div>
-        <div class="cartao"><span class="rotulo">Świechowski et al. [5] · 2023</span><p><strong>O que fizeram.</strong> Revisaram adaptações do MCTS, como mudar simulações ou combinar métodos.</p><p><strong>No projeto.</strong> Testamos mudanças pontuais em uma configuração de referência.</p></div>
-      </div>
-    </section>
-
-    <!-- 6. Regras -->
+    <!-- 3. Regras -->
     <section class="slide" aria-label="Regras modeladas">
-      <p class="sobretitulo">Metodologia · Problema e regras</p>
+      <p class="sobretitulo">Contexto</p>
       <h2>Regras explícitas no motor</h2>
       <div class="colunas regras-slide">
         <div>
@@ -311,6 +257,60 @@
           <svg class="tabuleiro" viewBox="0 0 480 480" id="regra-tabuleiro" role="img" aria-label="Demonstração das regras da Trilha"></svg>
           <p class="nota" id="regra-descricao" role="status"></p>
         </div>
+      </div>
+    </section>
+
+    <!-- 4. Motivação -->
+    <section class="slide" aria-label="Motivação e pergunta de pesquisa">
+      <p class="sobretitulo">Motivação</p>
+      <h2>Por que estudar um jogo já resolvido?</h2>
+      <div class="colunas c2" style="flex:none;margin-bottom:34px">
+        <div class="cartao">
+          <span class="rotulo">Gasser, 1996</span>
+          <p>Demonstrou o <strong>empate sob jogo perfeito</strong>, combinando busca e bases de finais.</p>
+        </div>
+        <div class="cartao">
+          <span class="rotulo">Mas…</span>
+          <p>A cada turno, nossos agentes calculam a jogada em <strong>poucos milissegundos</strong>. Eles jogam sem consultar tabelas de finais já resolvidos ou listas de jogadas recomendadas para o começo.</p>
+        </div>
+      </div>
+      <p class="sobretitulo">Pergunta de pesquisa</p>
+      <p class="destaque">Sob um mesmo orçamento de tempo por decisão, como MCTS/UCT se compara a Minimax com alfa-beta e a Monte Carlo plano no Trilha — e como essa comparação varia com o esforço de busca?</p>
+    </section>
+
+    <!-- 5. Objetivos -->
+    <section class="slide" aria-label="Objetivos">
+      <p class="sobretitulo">Objetivos</p>
+      <h2>O que desenvolvemos e avaliamos</h2>
+      <div class="colunas c2">
+        <div>
+          <span class="tag">Objetivo geral</span>
+          <p style="margin-top:16px;font-family:Georgia,serif;font-size:28px;line-height:1.4;color:var(--tinta)">Desenvolver e avaliar, com interface JavaScript e busca em Rust/WebAssembly, um ambiente <strong>reprodutível</strong> de confronto entre os três agentes.</p>
+          <p class="nota" style="margin-top:20px">A comparação considera o protocolo, os adversários e os recursos. As conclusões se limitam às condições avaliadas.</p>
+        </div>
+        <div>
+          <span class="tag">Objetivos específicos</span>
+          <ol style="margin-top:16px">
+            <li>Formalizar as regras e a representação do estado</li>
+            <li>Implementar um motor compartilhado e os três agentes</li>
+            <li>Produzir registros auditáveis das partidas</li>
+            <li>Comparar pontuação, vitórias, empates, derrotas e custo computacional</li>
+            <li>Analisar parâmetros de busca e diferentes posições iniciais</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Trabalhos relacionados -->
+    <section class="slide" aria-label="Trabalhos relacionados">
+      <p class="sobretitulo">Trabalhos relacionados</p>
+      <h2>O que cada trabalho explica no nosso projeto</h2>
+      <div class="colunas c3 fontes">
+        <div class="cartao"><span class="rotulo">Gasser [1] · 1996</span><p><strong>O que fez.</strong> Calculou finais de trás para frente e usou esses resultados para provar o empate sob jogo perfeito.</p><p><strong>No projeto.</strong> Comparamos decisões tomadas na hora, com tempo limitado.</p></div>
+        <div class="cartao"><span class="rotulo">Knuth &amp; Moore [2] · 1975</span><p><strong>O que fizeram.</strong> Provaram quando pular ramos da busca preserva o resultado do Minimax.</p><p><strong>No projeto.</strong> É a poda alfa-beta que reduz o trabalho do nosso Minimax.</p></div>
+        <div class="cartao"><span class="rotulo">Kocsis &amp; Szepesvári [3] · 2006</span><p><strong>O que fizeram.</strong> Criaram o UCT para revisitar boas opções e dar chances às pouco exploradas.</p><p><strong>No projeto.</strong> O UCT decide qual ramo o MCTS pesquisa a seguir.</p></div>
+        <div class="cartao"><span class="rotulo">Browne et al. [4] · 2012</span><p><strong>O que fizeram.</strong> Revisaram como o MCTS cresce uma árvore e aprende com simulações.</p><p><strong>No projeto.</strong> Seguimos seu esquema de quatro etapas e escolhemos o filho mais visitado.</p></div>
+        <div class="cartao"><span class="rotulo">Świechowski et al. [5] · 2023</span><p><strong>O que fizeram.</strong> Revisaram adaptações do MCTS, como mudar simulações ou combinar métodos.</p><p><strong>No projeto.</strong> Testamos mudanças pontuais em uma configuração de referência.</p></div>
       </div>
     </section>
 
